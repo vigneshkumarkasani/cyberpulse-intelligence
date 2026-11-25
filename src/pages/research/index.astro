@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CategoryNav from '../../components/CategoryNav.astro';
+import ArticleExplorer from '../../components/ArticleExplorer.astro';
+import DemoNotice from '../../components/DemoNotice.astro';
+import { countByCategory, getAllArticles } from '../../lib/articles';
+
+const articles = await getAllArticles();
+const counts = countByCategory(articles);
+const hasDemo = articles.some((article) => article.data.demo);
+---
+
+<BaseLayout title="Latest research" description="Long-form cybersecurity research from CyberPulse Intelligence, newest first, with sources and confidence stated." path="/research/">
+  <PageHero
+    eyebrow="Research"
+    title="Latest research"
+    description="Every analysis on CyberPulse, newest first. Search by keyword or filter by category. Each article lists its references and says how confident we are in its claims."
+  />
+
+  <section class="mx-auto max-w-7xl space-y-12 px-4 pb-24 sm:px-6 lg:px-8">
+    <CategoryNav counts={counts} />
+
+    {hasDemo && <DemoNotice />}
+
+    {
+      articles.length > 0 ? (
+        <ArticleExplorer articles={articles} />
+      ) : (
+        <p class="text-mist-400">Nothing has been published yet.</p>
+      )
+    }
+  </section>
+</BaseLayout>

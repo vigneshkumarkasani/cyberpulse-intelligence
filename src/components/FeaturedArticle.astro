@@ -1,0 +1,49 @@
+---
+import CategoryBadge from './CategoryBadge.astro';
+import DataBadge from './DataBadge.astro';
+import type { Article } from '../lib/articles';
+import { formatDate, getReadingMinutes } from '../lib/articles';
+import { withBase } from '../lib/url';
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+const { title, description, date, category, tags, demo } = article.data;
+const minutes = getReadingMinutes(article);
+---
+
+<article class="glass card-hover group relative overflow-hidden rounded-3xl p-7 sm:p-10 lg:p-12">
+  <!-- Soft blue light from the top corner; decorative only. -->
+  <div class="pointer-events-none absolute -right-32 -top-32 h-80 w-80 glow-blue opacity-70 transition-opacity duration-700 group-hover:opacity-100" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute inset-y-10 left-0 w-px bg-gradient-to-b from-transparent via-volt-400/70 to-transparent" aria-hidden="true"></div>
+
+  <div class="relative flex flex-wrap items-center gap-3">
+    <span class="inline-flex items-center gap-2 rounded-full bg-volt-500/15 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-volt-200">
+      <span class="pulse-dot h-1.5 w-1.5 rounded-full bg-volt-300" aria-hidden="true"></span>
+      Featured research
+    </span>
+    <CategoryBadge category={category} />
+    {demo && <DataBadge kind="demo" />}
+  </div>
+
+  <h2 class="relative mt-7 max-w-3xl font-serif text-3xl font-semibold leading-[1.15] tracking-tight text-white sm:text-5xl">
+    <a href={withBase(`/articles/${article.id}/`)} class="after:absolute after:inset-0 after:content-['']">{title}</a>
+  </h2>
+
+  <p class="relative mt-5 max-w-2xl text-base leading-relaxed text-mist-300 sm:text-lg">{description}</p>
+
+  <div class="relative mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-mist-400">
+    <time datetime={date.toISOString()}>{formatDate(date)}</time>
+    <span aria-hidden="true">•</span>
+    <span>{minutes} min read</span>
+    <ul class="flex flex-wrap gap-2">
+      {tags.map((tag) => <li class="rounded-md bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-mist-300">#{tag}</li>)}
+    </ul>
+  </div>
+
+  <p class="relative mt-8 inline-flex items-center gap-2 text-sm font-medium text-volt-200 transition-transform duration-300 group-hover:translate-x-1">
+    Read the analysis <span aria-hidden="true">→</span>
+  </p>
+</article>

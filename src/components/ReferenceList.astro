@@ -1,0 +1,31 @@
+---
+import type { Article } from '../lib/articles';
+
+interface Props {
+  references: Article['data']['references'];
+}
+
+const { references } = Astro.props;
+---
+
+{
+  references.length > 0 && (
+    <section aria-labelledby="references-heading" class="mt-16 border-t border-white/10 pt-10">
+      <h2 id="references-heading" class="text-xl font-semibold tracking-tight text-white">References</h2>
+      <ol class="mt-5 list-decimal space-y-3 pl-5 text-sm leading-relaxed text-mist-300 marker:text-volt-400">
+        {references.map((reference) => (
+          <li>
+            {reference.url ? (
+              <a href={reference.url} rel="noopener noreferrer" target="_blank" class="text-volt-300 underline decoration-volt-300/30 underline-offset-4 hover:text-white">
+                {reference.title}
+              </a>
+            ) : (
+              <span class="text-mist-100">{reference.title}</span>
+            )}
+            {reference.publisher && <span class="text-mist-500"> — {reference.publisher}</span>}
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}

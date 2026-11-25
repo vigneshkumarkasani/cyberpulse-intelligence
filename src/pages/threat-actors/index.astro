@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryIndex from '../../components/CategoryIndex.astro';
+import { getArticlesByCategory } from '../../lib/articles';
+
+const articles = await getArticlesByCategory('threat-actors');
+---
+
+<BaseLayout title="Threat actors" description="Threat actor profiles from CyberPulse Intelligence, built from public reporting with attribution confidence stated." path="/threat-actors/">
+  <CategoryIndex
+    category="threat-actors"
+    articles={articles}
+    description="Actor profiles compiled from public reporting. Every profile separates what is reported, what is inferred, and how confident we are in the attribution."
+  />
+</BaseLayout>

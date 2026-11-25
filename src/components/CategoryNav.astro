@@ -1,0 +1,38 @@
+---
+import { CATEGORIES, CATEGORY_META } from '../consts';
+import { withBase } from '../lib/url';
+
+interface Props {
+  /** Article count per category, shown next to each link. */
+  counts?: Record<string, number>;
+  /** Category currently being viewed, if any. */
+  active?: string;
+}
+
+const { counts = {}, active } = Astro.props;
+---
+
+<nav aria-label="Categories">
+  <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    {
+      CATEGORIES.map((category) => (
+        <li>
+          <a
+            href={withBase(CATEGORY_META[category].path)}
+            aria-current={active === category ? 'page' : undefined}
+            class:list={[
+              'glass card-hover flex h-full flex-col gap-2 rounded-2xl p-5',
+              active === category && 'border-volt-500/60 bg-volt-500/10',
+            ]}
+          >
+            <span class="flex items-center justify-between text-sm font-semibold text-white">
+              {CATEGORY_META[category].label}
+              <span class="rounded-md bg-white/5 px-2 py-0.5 font-mono text-xs text-mist-400">{counts[category] ?? 0}</span>
+            </span>
+            <span class="text-xs leading-relaxed text-mist-400">{CATEGORY_META[category].summary}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

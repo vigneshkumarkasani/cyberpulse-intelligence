@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+
+const confidenceLevels = [
+  { level: 'Confirmed', meaning: 'Reproduced, or stated by a primary source with direct evidence.' },
+  { level: 'Likely', meaning: 'Consistent across several independent sources, with no contradicting evidence.' },
+  { level: 'Possible', meaning: 'Plausible and partly supported. Evidence is limited or single-sourced.' },
+  { level: 'Unverified', meaning: 'Reported but not checked. Kept only when the uncertainty is itself useful.' },
+];
+
+const sourceGrades = [
+  { grade: 'A', source: 'Primary: vendor advisories, maintainer patches, original samples and telemetry we can inspect.' },
+  { grade: 'B', source: 'Established secondary: reputable research teams and security agencies that cite their evidence.' },
+  { grade: 'C', source: 'Other secondary: news coverage and commentary. Used for context, not for key claims.' },
+];
+---
+
+<BaseLayout title="Research methodology" description="How CyberPulse Intelligence researches, grades sources, states confidence and handles indicators of compromise." path="/methodology/">
+  <PageHero
+    eyebrow="Methodology"
+    title="How we research"
+    description="The process behind every article: how we gather evidence, grade sources, state confidence and handle indicators. This describes the intended process for the project."
+  />
+
+  <section class="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
+    <div class="prose-article">
+      <h2>1. Scope and questions</h2>
+      <p>
+        Every article starts with a written question, such as "Is this vulnerability exploitable in a default
+        configuration?" or "Which detections still work if the sample is repacked?" A piece that cannot state its
+        question is not ready to publish.
+      </p>
+
+      <h2>2. Source grading</h2>
+      <p>Sources are graded by how close they are to the evidence. Key claims should rest on grade A or B sources.</p>
+      <div class="overflow-x-auto">
+        <table>
+          <thead><tr><th>Grade</th><th>Source type</th></tr></thead>
+          <tbody>
+            {sourceGrades.map((row) => (
+              <tr><td>{row.grade}</td><td>{row.source}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2>3. Confidence levels</h2>
+      <p>Each substantive claim is tagged with one of four confidence levels. Where a claim is not tagged, it is background.</p>
+      <div class="overflow-x-auto">
+        <table>
+          <thead><tr><th>Level</th><th>Meaning</th></tr></thead>
+          <tbody>
+            {confidenceLevels.map((row) => (
+              <tr><td><strong>{row.level}</strong></td><td>{row.meaning}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2>4. Indicators of compromise</h2>
+      <p>
+        Indicators are published only when they help a defender and only with context on how long they remain
+        useful. Example and reserved values are used in documentation. Where possible, we publish indicators in
+        a machine-readable form next to the article, with a last-seen date.
+      </p>
+      <ul>
+        <li>Mark every indicator with its confidence level.</li>
+        <li>Give a review date. Stale indicators are retired, not left in place.</li>
+        <li>Never publish personal data found in samples or telemetry.</li>
+      </ul>
+
+      <h2>5. Exploit and vulnerability content</h2>
+      <p>
+        We write about exploitation for defenders: how it is observed, how exposure is checked and what changes
+        the risk. We do not publish working exploit code or step-by-step instructions for attacking systems.
+      </p>
+
+      <h2>6. Review, corrections and labelling</h2>
+      <p>
+        Articles are reviewed by a second person before publication. When a published claim is found to be wrong,
+        we correct the article and set its <em>Updated</em> date. Material corrections are noted at the top of
+        the article.
+      </p>
+      <p>
+        Anything that is not real research is labelled as sample content. This includes placeholder CVE
+        identifiers, illustrative examples and template articles. Sample articles can never be cited as findings.
+      </p>
+
+      <h2>7. Reproducibility</h2>
+      <p>
+        Where a technique can be reproduced safely, the article describes how to reproduce it, using lab
+        resources and clearly marked example data. Where it cannot be shared safely, the article says so.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

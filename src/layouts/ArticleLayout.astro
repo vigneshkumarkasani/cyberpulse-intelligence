@@ -1,0 +1,123 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import DemoNotice from '../components/DemoNotice.astro';
+import ReferenceList from '../components/ReferenceList.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import { CATEGORY_META } from '../consts';
+import { formatDate, getReadingMinutes, type Article } from '../lib/articles';
+import { withBase } from '../lib/url';
+
+interface Props {
+  article: Article;
+  headings: { depth: number; slug: string; text: string }[];
+  related: Article[];
+}
+
+const { article, headings, related } = Astro.props;
+const { title, description, date, updated, category, tags, demo } = article.data;
+const tocHeadings = headings.filter((heading) => heading.depth === 2);
+const minutes = getReadingMinutes(article);
+const articleUrl = new URL(withBase(`/articles/${article.id}/`), Astro.site).toString();
+
+// Schema.org Article markup helps search engines understand the page.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: date.toISOString(),
+  dateModified: (updated ?? date).toISOString(),
+  keywords: tags.join(', '),
+  mainEntityOfPage: articleUrl,
+  author: { '@type': 'Organization', name: 'CyberPulse Intelligence' },
+  publisher: { '@type': 'Organization', name: 'CyberPulse Intelligence' },
+  ...(demo && { disclaimer: 'Sample content for demonstration only.' }),
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  path={`/articles/${article.id}/`}
+  type="article"
+  publishedTime={date}
+  modifiedTime={updated}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <div id="reading-progress" class="fixed inset-x-0 top-0 z-[60] h-0.5 origin-left scale-x-0 bg-linear-to-r from-volt-500 to-volt-300" aria-hidden="true"></div>
+
+  <article class="mx-auto max-w-7xl px-4 pb-10 pt-12 sm:px-6 sm:pt-16 lg:px-8">
+    <nav aria-label="Breadcrumb" class="text-xs text-mist-500">
+      <ol class="flex flex-wrap items-center gap-2">
+        <li><a href={withBase('/')} class="hover:text-white">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href={withBase(CATEGORY_META[category].path)} class="hover:text-white">{CATEGORY_META[category].label}</a></li>
+      </ol>
+    </nav>
+
+    <div class="mt-8 grid gap-12 xl:grid-cols-[1fr_16rem] xl:gap-16">
+      <div class="min-w-0">
+        <header>
+          <p class="text-xs font-medium uppercase tracking-[0.18em] text-volt-300">{CATEGORY_META[category].label}</p>
+          <h1 class="mt-4 font-serif text-4xl font-semibold leading-[1.12] tracking-tight sm:text-5xl">{title}</h1>
+          <p class="mt-6 max-w-[68ch] text-lg leading-relaxed text-mist-300">{description}</p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-white/10 py-4 text-sm text-mist-400">
+            <span>Published <time datetime={date.toISOString()}>{formatDate(date)}</time></span>
+            {updated && <span>Updated <time datetime={updated.toISOString()}>{formatDate(updated)}</time></span>}
+            <span>{minutes} min read</span>
+            <ul class="flex flex-wrap gap-2">
+              {tags.map((tag) => <li class="rounded-md bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-mist-300">#{tag}</li>)}
+            </ul>
+          </div>
+        </header>
+
+        {demo && <DemoNotice class="mt-8" />}
+
+        <div class="prose-article mt-10">
+          <slot />
+        </div>
+
+        <ReferenceList references={article.data.references} />
+      </div>
+
+      {
+        tocHeadings.length > 1 && (
+          <aside class="hidden xl:block">
+            <nav aria-label="On this page" class="sticky top-28 text-sm">
+              <p class="mb-4 text-xs font-medium uppercase tracking-wider text-mist-500">On this page</p>
+              <ul class="space-y-2.5 border-l border-white/10">
+                {tocHeadings.map((heading) => (
+                  <li>
+                    <a href={`#${heading.slug}`} class="-ml-px block border-l border-transparent pl-4 text-mist-400 transition-colors hover:border-volt-400 hover:text-white">
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        )
+      }
+    </div>
+
+    <RelatedArticles articles={related} />
+  </article>
+</BaseLayout>
+
+<script>
+  // Reading progress bar. Purely decorative; the page works without it.
+  const bar = document.getElementById('reading-progress');
+  if (bar) {
+    const update = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? window.scrollY / max : 0;
+      bar.style.transform = `scaleX(${Math.min(1, Math.max(0, ratio))})`;
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+</script>

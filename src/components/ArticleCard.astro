@@ -1,0 +1,39 @@
+---
+import CategoryBadge from './CategoryBadge.astro';
+import type { Article } from '../lib/articles';
+import { formatDate, getReadingMinutes } from '../lib/articles';
+import { withBase } from '../lib/url';
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+const { title, description, date, category, tags, demo } = article.data;
+const href = withBase(`/articles/${article.id}/`);
+const minutes = getReadingMinutes(article);
+---
+
+<article class="card-hover group relative flex h-full flex-col rounded-2xl border border-white/[0.07] bg-ink-900/70 p-6 hover:bg-ink-800/70">
+  <div class="flex items-center justify-between gap-3">
+    <CategoryBadge category={category} />
+    {demo && <span class="rounded-full border border-amber-400/25 px-2 py-0.5 text-[0.65rem] uppercase tracking-wider text-amber-200">Sample</span>}
+  </div>
+
+  <h3 class="mt-4 text-lg font-semibold leading-snug tracking-tight">
+    <a href={href} class="after:absolute after:inset-0 after:content-['']">{title}</a>
+  </h3>
+
+  <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-mist-400">{description}</p>
+
+  <div class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-5 text-xs text-mist-500">
+    <time datetime={date.toISOString()}>{formatDate(date)}</time>
+    <span aria-hidden="true">•</span>
+    <span>{minutes} min read</span>
+    <ul class="flex w-full flex-wrap gap-1.5 pt-1" aria-label="Tags">
+      {tags.slice(0, 3).map((tag) => (
+        <li class="rounded-md bg-white/[0.04] px-1.5 py-0.5 font-mono text-[0.7rem] text-mist-300">#{tag}</li>
+      ))}
+    </ul>
+  </div>
+</article>

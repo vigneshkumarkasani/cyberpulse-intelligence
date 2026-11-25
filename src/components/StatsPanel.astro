@@ -1,0 +1,45 @@
+---
+import type { SiteStats } from '../lib/articles';
+import { formatDate } from '../lib/articles';
+import DataBadge from './DataBadge.astro';
+
+interface Props {
+  stats: SiteStats;
+}
+
+const { stats } = Astro.props;
+
+const items = [
+  { label: 'Articles in corpus', value: stats.articles },
+  { label: 'Categories in use', value: stats.categories },
+  { label: 'Distinct tags', value: stats.tags },
+  { label: 'Source references', value: stats.references },
+];
+---
+
+<section aria-labelledby="stats-heading" class="glass rounded-3xl p-6 sm:p-8">
+  <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <div class="flex flex-wrap items-center gap-3">
+        <h2 id="stats-heading" class="text-lg font-semibold text-white">Corpus statistics</h2>
+        <DataBadge kind="demo" />
+      </div>
+      <p class="mt-1 max-w-xl text-sm text-mist-400">
+        Counted live from the articles in this repository. These numbers describe the content on this site, not
+        threat activity in the wild.
+      </p>
+    </div>
+    {stats.latestDate && <p class="text-xs text-mist-500">Latest entry: <time datetime={stats.latestDate.toISOString()}>{formatDate(stats.latestDate)}</time></p>}
+  </div>
+
+  <dl class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/5 lg:grid-cols-4">
+    {
+      items.map((item) => (
+        <div class="bg-ink-900/80 p-5">
+          <dt class="text-xs uppercase tracking-wider text-mist-500">{item.label}</dt>
+          <dd class="mt-2 font-mono text-3xl font-semibold tabular-nums text-white">{item.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</section>

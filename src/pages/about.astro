@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import DemoNotice from '../components/DemoNotice.astro';
+import { SITE } from '../consts';
+---
+
+<BaseLayout title="About" description="About CyberPulse Intelligence: what the project is, what it publishes and what it does not do yet." path="/about/">
+  <PageHero
+    eyebrow="About"
+    title="About CyberPulse Intelligence"
+    description="A research publication for cybersecurity analysis, built to show its working: sources, confidence and limits, stated on every page."
+  />
+
+  <section class="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
+    <div class="grid gap-12 lg:grid-cols-[1fr_20rem]">
+      <div class="prose-article">
+        <h2>What we publish</h2>
+        <p>
+          CyberPulse Intelligence publishes written analysis in five areas: latest research, CVE intelligence,
+          malware analysis, threat actor profiles and exploit intelligence. Each area is written for people who
+          defend systems. Articles explain what is happening, why it matters, and what a team can check or change.
+        </p>
+
+        <h2>What we will not do</h2>
+        <ul>
+          <li>Publish invented statistics, incidents or research findings presented as real.</li>
+          <li>Publish working exploit code or step-by-step attack instructions.</li>
+          <li>Name individuals in threat actor profiles without a documented public basis.</li>
+          <li>Claim attribution with more confidence than the evidence supports.</li>
+        </ul>
+
+        <h2>Current state of the project</h2>
+        <p>
+          This is the first production-quality version of the site. The articles currently in the repository are
+          <strong>sample content</strong> that demonstrates the structure, reading experience and metadata. They
+          are labelled as such on every page and are not research.
+        </p>
+        <p>
+          There is no automatic publishing, no live threat feed, no newsletter service and no analytics connected
+          yet. Those are planned and will be added deliberately, with their own review.
+        </p>
+
+        <h2>Contact and corrections</h2>
+        <p>
+          The project source, issue tracker and corrections process live on
+          <a href={SITE.repository} rel="noopener" target="_blank">GitHub</a>. Corrections to published research
+          are recorded in the article's <em>Updated</em> date.
+        </p>
+      </div>
+
+      <aside class="space-y-6">
+        <DemoNotice />
+        <div class="glass rounded-2xl p-6 text-sm leading-relaxed text-mist-300">
+          <p class="font-semibold text-white">Stack</p>
+          <p class="mt-2">Astro, TypeScript, Tailwind CSS and Markdown content collections, deployed to GitHub Pages with GitHub Actions.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

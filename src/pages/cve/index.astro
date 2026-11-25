@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryIndex from '../../components/CategoryIndex.astro';
+import { getArticlesByCategory } from '../../lib/articles';
+
+const articles = await getArticlesByCategory('cve');
+---
+
+<BaseLayout title="CVE intelligence" description="Vulnerability triage from CyberPulse Intelligence: affected products, severity context and remediation priorities." path="/cve/">
+  <CategoryIndex
+    category="cve"
+    articles={articles}
+    description="Vulnerability triage for defenders. We focus on what is affected, how exposed a typical environment is, and what to do first. Severity scores alone are not treated as a priority."
+  />
+</BaseLayout>

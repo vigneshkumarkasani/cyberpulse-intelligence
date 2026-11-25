@@ -1,0 +1,171 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<!--
+  Decorative 3D-style network: nodes on a sphere, projected with simple perspective
+  and rotated slowly on a 2D canvas. No 3D library. Pauses when off-screen or in a
+  background tab, and draws a single static frame under prefers-reduced-motion.
+-->
+<div class:list={['pointer-events-none absolute inset-0 overflow-hidden', className]} aria-hidden="true" data-network>
+  <canvas class="network-canvas h-full w-full" data-network-canvas></canvas>
+</div>
+
+<script>
+  type Point = { x: number; y: number; z: number };
+
+  // Fixed seed so the constellation looks the same on every visit.
+  function seeded(seed: number) {
+    let state = seed;
+    return () => {
+      state = (state * 16807) % 2147483647;
+      return state / 2147483647;
+    };
+  }
+
+  function buildPoints(count: number): Point[] {
+    const random = seeded(42);
+    return Array.from({ length: count }, () => {
+      // Uniform-ish point inside a sphere of radius 1.
+      const theta = random() * Math.PI * 2;
+      const phi = Math.acos(2 * random() - 1);
+      const r = Math.cbrt(0.35 + random() * 0.65);
+      return {
+        x: r * Math.sin(phi) * Math.cos(theta),
+        y: r * Math.sin(phi) * Math.sin(theta),
+        z: r * Math.cos(phi),
+      };
+    });
+  }
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function mountNetwork(container: HTMLElement) {
+    const canvas = container.querySelector<HTMLCanvasElement>('[data-network-canvas]');
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let points: Point[] = [];
+    let angle = 0;
+    let frameId = 0;
+    let last = 0;
+    let inView = true;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function draw() {
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx!.clearRect(0, 0, width, height);
+      if (width === 0 || height === 0) return;
+
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      // Gentle fixed tilt so the sphere reads as three-dimensional.
+      const tilt = 0.28;
+      const cosT = Math.cos(tilt);
+      const sinT = Math.sin(tilt);
+      const scale = Math.min(width, height) * 0.46;
+      const threshold = scale * 0.5;
+
+      const projected = points.map((p) => {
+        const x1 = p.x * cos + p.z * sin;
+        const z1 = -p.x * sin + p.z * cos;
+        const y1 = p.y * cosT - z1 * sinT;
+        const z2 = p.y * sinT + z1 * cosT;
+        const perspective = 1 / (1 + z2 * 0.35);
+        return {
+          sx: width / 2 + x1 * perspective * scale,
+          sy: height / 2 + y1 * perspective * scale,
+          depth: (z2 + 1) / 2, // 0 = far, 1 = near
+        };
+      });
+
+      // Connecting lines: nearer pairs in screen space are drawn more strongly.
+      ctx!.lineWidth = 1;
+      for (let i = 0; i < projected.length; i++) {
+        for (let j = i + 1; j < projected.length; j++) {
+          const a = projected[i];
+          const b = projected[j];
+          const dx = a.sx - b.sx;
+          const dy = a.sy - b.sy;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance > threshold) continue;
+          const closeness = 1 - distance / threshold;
+          const depth = (a.depth + b.depth) / 2;
+          ctx!.strokeStyle = `rgba(61, 148, 255, ${(closeness * (0.1 + depth * 0.22)).toFixed(3)})`;
+          ctx!.beginPath();
+          ctx!.moveTo(a.sx, a.sy);
+          ctx!.lineTo(b.sx, b.sy);
+          ctx!.stroke();
+        }
+      }
+
+      // Nodes: near nodes are larger and brighter, with a faint halo.
+      for (const p of projected) {
+        const radius = 1 + p.depth * 2.2;
+        if (p.depth > 0.6) {
+          ctx!.fillStyle = `rgba(30, 123, 255, ${((p.depth - 0.6) * 0.35).toFixed(3)})`;
+          ctx!.beginPath();
+          ctx!.arc(p.sx, p.sy, radius * 4, 0, Math.PI * 2);
+          ctx!.fill();
+        }
+        ctx!.fillStyle = `rgba(140, 196, 255, ${(0.25 + p.depth * 0.6).toFixed(3)})`;
+        ctx!.beginPath();
+        ctx!.arc(p.sx, p.sy, radius, 0, Math.PI * 2);
+        ctx!.fill();
+      }
+    }
+
+    function tick(now: number) {
+      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
+      angle += dt * 0.09; // about one slow turn every 70 seconds
+      draw();
+      frameId = requestAnimationFrame(tick);
+    }
+
+    function shouldAnimate() {
+      return inView && !document.hidden && !reduceMotion.matches;
+    }
+
+    function sync() {
+      cancelAnimationFrame(frameId);
+      last = 0;
+      if (shouldAnimate()) {
+        frameId = requestAnimationFrame(tick);
+      } else {
+        draw();
+      }
+    }
+
+    function resize() {
+      const rect = container.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas!.width = Math.round(width * dpr);
+      canvas!.height = Math.round(height * dpr);
+      // Node density scales with area, capped so small screens stay light.
+      const count = Math.round(Math.min(70, Math.max(26, (width * height) / 19000)));
+      if (points.length !== count) points = buildPoints(count);
+      draw();
+    }
+
+    new ResizeObserver(resize).observe(container);
+    new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      sync();
+    }).observe(container);
+    document.addEventListener('visibilitychange', sync);
+    reduceMotion.addEventListener('change', sync);
+    resize();
+    sync();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-network]').forEach(mountNetwork);
+</script>

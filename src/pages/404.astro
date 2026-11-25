@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+---
+
+<BaseLayout title="Page not found" description="The page you are looking for does not exist on CyberPulse Intelligence." path="/404.html" noindex>
+  <section class="relative isolate flex min-h-[70vh] items-center overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 -z-10 grid-bg grid-bg-animated opacity-60" aria-hidden="true"></div>
+    <div class="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
+      <p class="font-mono text-sm text-volt-300">404</p>
+      <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Signal lost.</h1>
+      <p class="mx-auto mt-5 max-w-xl text-mist-300">That page does not exist, or it has moved. Try the latest research or the homepage.</p>
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a href={withBase('/')} class="rounded-xl bg-volt-500 px-5 py-3 text-sm font-semibold text-white hover:bg-volt-400">Homepage</a>
+        <a href={withBase('/research/')} class="glass rounded-xl px-5 py-3 text-sm font-semibold text-mist-100 hover:text-white">Latest research</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

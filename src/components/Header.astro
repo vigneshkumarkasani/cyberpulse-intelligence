@@ -1,0 +1,91 @@
+---
+import Logo from './Logo.astro';
+import { NAV_ITEMS, SITE } from '../consts';
+import { withBase } from '../lib/url';
+
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  const target = withBase(href);
+  return currentPath === target || currentPath.startsWith(target);
+}
+---
+
+<header class="sticky top-0 z-50 px-3 pt-3 sm:px-6">
+  <div class="glass mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl px-4 sm:px-5">
+    <a href={withBase('/')} class="group flex items-center gap-2.5" aria-label={`${SITE.name} home`}>
+      <Logo class="h-8 w-8 transition-transform duration-500 group-hover:rotate-6" />
+      <span class="text-[0.95rem] font-semibold tracking-tight text-white sm:text-base">
+        CyberPulse<span class="text-volt-300"> Intelligence</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary" class="hidden items-center gap-1 lg:flex">
+      {
+        NAV_ITEMS.map((item) => (
+          <a
+            href={withBase(item.href)}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+            class:list={[
+              'nav-link rounded-lg px-3 py-2 text-sm transition-colors duration-200',
+              isActive(item.href)
+                ? 'bg-volt-500/15 text-white'
+                : 'text-mist-400 hover:bg-white/5 hover:text-white',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <details class="group relative lg:hidden">
+      <summary
+        class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg text-mist-100 transition-colors hover:bg-white/5 [&::-webkit-details-marker]:hidden"
+        aria-label="Open navigation menu"
+      >
+        <span class="relative block h-3.5 w-5" aria-hidden="true">
+          <span class="absolute inset-x-0 top-0 h-0.5 rounded bg-current transition-transform duration-300 group-open:translate-y-1.5 group-open:rotate-45"></span>
+          <span class="absolute inset-x-0 bottom-0 h-0.5 rounded bg-current transition-transform duration-300 group-open:-translate-y-1.5 group-open:-rotate-45"></span>
+        </span>
+      </summary>
+      <nav
+        aria-label="Mobile"
+        class="glass absolute right-0 top-12 w-64 rounded-2xl p-2 shadow-2xl shadow-black/50"
+      >
+        {
+          NAV_ITEMS.map((item) => (
+            <a
+              href={withBase(item.href)}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class:list={[
+                'block rounded-lg px-3 py-2.5 text-sm',
+                isActive(item.href) ? 'bg-volt-500/15 text-white' : 'text-mist-300 hover:bg-white/5 hover:text-white',
+              ]}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </details>
+  </div>
+</header>
+
+<script>
+  // Mobile menu: close on link tap, Escape, or a tap outside. Without this the
+  // native <details> menu still works, it just stays open in those cases.
+  const menu = document.querySelector<HTMLDetailsElement>('header details');
+  if (menu) {
+    const close = () => {
+      menu.open = false;
+    };
+    menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', close));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') close();
+    });
+    document.addEventListener('click', (event) => {
+      if (menu.open && !menu.contains(event.target as Node)) close();
+    });
+  }
+</script>

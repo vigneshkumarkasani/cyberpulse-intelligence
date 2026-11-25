@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FeaturedArticle from '../components/FeaturedArticle.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import CategoryNav from '../components/CategoryNav.astro';
+import StatsPanel from '../components/StatsPanel.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+import DemoNotice from '../components/DemoNotice.astro';
+import NetworkField from '../components/NetworkField.astro';
+import IntelligencePanel from '../components/IntelligencePanel.astro';
+import { SITE } from '../consts';
+import { withBase } from '../lib/url';
+import {
+  countByCategory,
+  getAllArticles,
+  getFeaturedArticle,
+  getSiteStats,
+} from '../lib/articles';
+
+const articles = await getAllArticles();
+const featured = await getFeaturedArticle();
+const latest = articles.filter((article) => article.id !== featured?.id).slice(0, 3);
+const stats = getSiteStats(articles);
+const counts = countByCategory(articles);
+---
+
+<BaseLayout title={SITE.name} path="/">
+  <!-- Hero -->
+  <section class="relative isolate overflow-hidden">
+    <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[90%] grid-bg grid-bg-animated opacity-80" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute left-1/2 top-24 -z-10 h-[32rem] w-[52rem] -translate-x-1/2 glow-blue opacity-60" aria-hidden="true"></div>
+    <NetworkField class="-z-10 hero-network" />
+    <!-- Dark scrim behind the copy keeps the headline legible over the network. -->
+    <div class="hero-scrim pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+
+    <div class="mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 sm:pt-24 lg:px-8 lg:pb-28">
+      <p class="reveal inline-flex max-w-full items-start gap-2 rounded-2xl border border-volt-500/30 bg-volt-500/10 px-3.5 py-1.5 text-xs leading-relaxed font-medium text-volt-300 sm:items-center sm:rounded-full">
+        <span class="pulse-dot h-1.5 w-1.5 rounded-full bg-volt-400" aria-hidden="true"></span>
+        Research platform in early development · no live feeds connected
+      </p>
+
+      <h1 class="reveal mt-8 max-w-5xl text-5xl font-semibold leading-[1.02] tracking-tight sm:text-7xl lg:text-8xl" style="animation-delay: 80ms">
+        <span class="text-gradient-volt">Signal</span> <span class="text-white">over noise.</span><br class="hidden sm:block" />
+        <span class="text-mist-100">Evidence over rumour.</span>
+      </h1>
+
+      <p class="reveal mt-8 max-w-2xl text-base leading-relaxed text-mist-300 sm:text-xl" style="animation-delay: 180ms">
+        CyberPulse Intelligence is a home for long-form cybersecurity research: vulnerability triage, malware
+        analysis, threat actor profiles and exploit intelligence, each with its sources and confidence made
+        explicit.
+      </p>
+
+      <div class="reveal mt-10 flex flex-wrap items-center gap-3" style="animation-delay: 260ms">
+        <a
+          href={withBase('/research/')}
+          class="rounded-xl bg-volt-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-volt-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-volt-400"
+        >
+          Read the latest research
+        </a>
+        <a
+          href={withBase('/methodology/')}
+          class="glass rounded-xl px-5 py-3 text-sm font-semibold text-mist-100 transition-all duration-300 hover:-translate-y-0.5 hover:text-white"
+        >
+          How we research
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="mx-auto max-w-7xl space-y-24 px-4 pb-8 sm:px-6 lg:px-8">
+    {
+      featured && (
+        <section aria-labelledby="featured-heading">
+          <h2 id="featured-heading" class="sr-only">Featured research</h2>
+          <FeaturedArticle article={featured} />
+        </section>
+      )
+    }
+
+    <section aria-labelledby="categories-heading">
+      <div class="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-medium uppercase tracking-[0.18em] text-volt-300">Navigate</p>
+          <h2 id="categories-heading" class="mt-2 text-3xl font-semibold tracking-tight">Browse by category</h2>
+        </div>
+      </div>
+      <CategoryNav counts={counts} />
+    </section>
+
+    <section aria-labelledby="latest-heading">
+      <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-medium uppercase tracking-[0.18em] text-volt-300">Latest</p>
+          <h2 id="latest-heading" class="mt-2 text-3xl font-semibold tracking-tight">Latest articles</h2>
+        </div>
+        <a href={withBase('/research/')} class="text-sm font-medium text-volt-300 hover:text-white">View all research →</a>
+      </div>
+
+      <DemoNotice class="mb-8" />
+
+      {
+        latest.length > 0 ? (
+          <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {latest.map((article) => (
+              <ArticleCard article={article} />
+            ))}
+          </div>
+        ) : (
+          <p class="text-mist-400">No articles have been published yet.</p>
+        )
+      }
+    </section>
+
+    <IntelligencePanel counts={counts} />
+
+    <StatsPanel stats={stats} />
+
+    <NewsletterSignup />
+  </div>
+</BaseLayout>

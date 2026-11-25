@@ -1,0 +1,62 @@
+---
+import Logo from './Logo.astro';
+import { NAV_ITEMS, SITE } from '../consts';
+import { withBase } from '../lib/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="relative mt-24 border-t border-white/5 bg-ink-900/60">
+  <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
+    <div>
+      <a href={withBase('/')} class="flex items-center gap-2.5">
+        <Logo class="h-7 w-7" />
+        <span class="font-semibold tracking-tight text-white">CyberPulse Intelligence</span>
+      </a>
+      <p class="mt-4 max-w-md text-sm leading-relaxed text-mist-400">
+        Cybersecurity research and threat intelligence, written for defenders. Every claim should carry its
+        source and a stated confidence level.
+      </p>
+      <p class="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs text-amber-200">
+        <span aria-hidden="true">●</span> Current content is clearly labelled sample material.
+      </p>
+    </div>
+
+    <nav aria-label="Footer" class="text-sm">
+      <p class="mb-3 font-medium text-white">Explore</p>
+      <ul class="grid grid-cols-2 gap-x-6 gap-y-2 text-mist-400">
+        {
+          NAV_ITEMS.map((item) => (
+            <li>
+              <a href={withBase(item.href)} class="transition-colors hover:text-white">{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="text-sm">
+      <p class="mb-3 font-medium text-white">Project</p>
+      <ul class="space-y-2 text-mist-400">
+        <li>
+          <a href={SITE.repository} class="transition-colors hover:text-white" rel="noopener" target="_blank">
+            Source on GitHub
+          </a>
+        </li>
+        <li>
+          <a href={withBase('/research/')} class="transition-colors hover:text-white">Research index</a>
+        </li>
+        <li>
+          <a href={withBase('/methodology/')} class="transition-colors hover:text-white">How we research</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-white/5">
+    <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-xs text-mist-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+      <p>&copy; {year} CyberPulse Intelligence. All rights reserved.</p>
+      <p>Built with Astro and deployed on GitHub Pages.</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,389 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Theme tokens (Tailwind v4 reads these as utilities, e.g. bg-ink-950)
+   ------------------------------------------------------------------ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-ink-950: #04060c;
+  --color-ink-900: #080d18;
+  --color-ink-800: #0d1526;
+  --color-ink-700: #172140;
+  --color-ink-600: #22305a;
+
+  --color-mist-100: #e6edf7;
+  --color-mist-300: #b9c5d8;
+  --color-mist-400: #8d9bb3;
+  --color-mist-500: #64748b;
+
+  --color-volt-300: #8cc4ff;
+  --color-volt-400: #3d94ff;
+  --color-volt-500: #1e7bff;
+  --color-volt-600: #1560d6;
+
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--color-ink-950);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ink-950 text-mist-100 font-sans antialiased;
+    min-height: 100dvh;
+    /* Safety net: stop any single element from creating a horizontal page scroll on phones. */
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: rgb(30 123 255 / 0.35);
+    color: white;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-volt-400);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-white;
+    text-wrap: balance;
+  }
+
+  a {
+    @apply transition-colors duration-200 ease-smooth;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Backgrounds and surfaces
+   ------------------------------------------------------------------ */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgb(30 123 255 / 0.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(30 123 255 / 0.075) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 25%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 25%, transparent 75%);
+}
+
+.grid-bg-animated {
+  animation: grid-drift 24s linear infinite;
+}
+
+@keyframes grid-drift {
+  to {
+    background-position: 56px 56px;
+  }
+}
+
+.glow-blue {
+  background: radial-gradient(closest-side, rgb(30 123 255 / 0.22), transparent 70%);
+}
+
+/* Glassmorphism: used sparingly (header, featured card, callouts). */
+.glass {
+  background: linear-gradient(160deg, rgb(20 30 54 / 0.7), rgb(9 14 26 / 0.6));
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgb(140 196 255 / 0.12);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.05),
+    0 24px 60px -36px rgb(0 0 0 / 0.8);
+}
+
+.card-hover {
+  transition:
+    transform 300ms var(--ease-smooth),
+    border-color 300ms var(--ease-smooth),
+    background-color 300ms var(--ease-smooth),
+    box-shadow 300ms var(--ease-smooth);
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  border-color: rgb(61 148 255 / 0.45);
+  box-shadow:
+    0 0 0 1px rgb(61 148 255 / 0.08),
+    0 24px 50px -28px rgb(30 123 255 / 0.5);
+}
+
+/* Bright, legible headline gradient: stays light from start to end. */
+.text-gradient-volt {
+  background: linear-gradient(100deg, #ffffff 0%, #d4e9ff 40%, #6fb2ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 28px rgb(30 123 255 / 0.35));
+}
+
+/* Hero: network field fades out toward the edges; scrim keeps text readable. */
+.hero-network {
+  opacity: 0.9;
+  mask-image: radial-gradient(ellipse 75% 70% at 65% 45%, black 35%, transparent 88%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 65% 45%, black 35%, transparent 88%);
+}
+
+.hero-scrim {
+  background: radial-gradient(ellipse 65% 60% at 18% 42%, rgb(4 6 12 / 0.78), transparent 72%);
+}
+
+/* Navigation: thin blue underline that slides in on hover and marks the current page. */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: 0.3rem;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-volt-300), transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 350ms var(--ease-smooth);
+}
+
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+/* Filter chips on the research page. aria-pressed drives the active state. */
+.filter-chip {
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--color-mist-300);
+  background: rgb(255 255 255 / 0.03);
+  cursor: pointer;
+  transition:
+    background-color 200ms var(--ease-smooth),
+    border-color 200ms var(--ease-smooth),
+    color 200ms var(--ease-smooth);
+}
+
+.filter-chip:hover {
+  color: white;
+  border-color: rgb(61 148 255 / 0.4);
+}
+
+.filter-chip[aria-pressed="true"] {
+  color: white;
+  background: rgb(30 123 255 / 0.18);
+  border-color: rgb(61 148 255 / 0.6);
+}
+
+/* ------------------------------------------------------------------
+   Entrance motion (respects reduced-motion below)
+   ------------------------------------------------------------------ */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal {
+  animation: fade-up 700ms var(--ease-smooth) both;
+}
+
+.pulse-dot {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgb(30 123 255 / 0.6);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 0 6px rgb(30 123 255 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .grid-bg-animated,
+  .reveal,
+  .pulse-dot {
+    animation: none;
+  }
+  .card-hover:hover {
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Long-form article typography
+   ------------------------------------------------------------------ */
+.prose-article {
+  font-family: var(--font-serif);
+  font-size: 1.1875rem;
+  line-height: 1.8;
+  color: var(--color-mist-300);
+  max-width: 68ch;
+}
+
+.prose-article > * + * {
+  margin-top: 1.15em;
+}
+
+.prose-article h2 {
+  font-family: var(--font-sans);
+  font-weight: 650;
+  font-size: 1.6rem;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  margin-top: 2.6em;
+  margin-bottom: 0.2em;
+  scroll-margin-top: 6rem;
+}
+
+.prose-article h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-top: 2em;
+  scroll-margin-top: 6rem;
+}
+
+.prose-article strong {
+  color: var(--color-mist-100);
+  font-weight: 600;
+}
+
+.prose-article a {
+  color: var(--color-volt-300);
+  text-decoration: underline;
+  text-decoration-color: rgb(140 196 255 / 0.35);
+  text-underline-offset: 3px;
+}
+
+.prose-article a:hover {
+  color: white;
+  text-decoration-color: var(--color-volt-400);
+}
+
+.prose-article ul,
+.prose-article ol {
+  padding-left: 1.4em;
+}
+
+.prose-article li + li {
+  margin-top: 0.4em;
+}
+
+.prose-article li::marker {
+  color: var(--color-volt-500);
+}
+
+.prose-article blockquote {
+  border-left: 2px solid var(--color-volt-500);
+  padding: 0.25em 0 0.25em 1.2em;
+  color: var(--color-mist-100);
+  font-style: italic;
+}
+
+.prose-article hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgb(140 196 255 / 0.3), transparent);
+  margin: 3em 0;
+}
+
+.prose-article :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: #d6e8ff;
+  background: rgb(30 123 255 / 0.12);
+  border: 1px solid rgb(30 123 255 / 0.2);
+  padding: 0.08em 0.38em;
+  border-radius: 0.35em;
+  word-break: break-word;
+}
+
+.prose-article pre {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  line-height: 1.65;
+  background: #060a13 !important; /* overrides Shiki inline background */
+  border: 1px solid rgb(140 196 255 / 0.12);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.75em 0;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
+}
+
+.prose-article pre code {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+}
+
+.prose-article table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  border-collapse: collapse;
+  margin: 1.75em 0;
+}
+
+.prose-article th,
+.prose-article td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid rgb(140 196 255 / 0.12);
+}
+
+.prose-article th {
+  color: white;
+  font-weight: 600;
+  background: rgb(30 123 255 / 0.08);
+  white-space: nowrap;
+}
+
+.prose-article td code {
+  font-size: 0.8em;
+}
+
+@media (max-width: 640px) {
+  .prose-article {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+}

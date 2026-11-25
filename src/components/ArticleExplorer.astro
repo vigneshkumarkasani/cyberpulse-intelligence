@@ -1,0 +1,102 @@
+---
+import ArticleCard from './ArticleCard.astro';
+import { CATEGORIES, CATEGORY_META } from '../consts';
+import type { Article } from '../lib/articles';
+
+interface Props {
+  articles: Article[];
+}
+
+const { articles } = Astro.props;
+
+// Without JavaScript every article stays visible; the controls only filter.
+---
+
+<div data-explorer class="space-y-8">
+  <div class="glass flex flex-col gap-4 rounded-2xl p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+    <label class="relative block w-full lg:max-w-md">
+      <span class="sr-only">Search articles</span>
+      <svg class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-mist-500" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.6" />
+        <path d="m14 14 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      </svg>
+      <input
+        type="search"
+        data-search
+        placeholder="Search titles, tags and summaries"
+        autocomplete="off"
+        class="w-full rounded-xl border border-white/10 bg-ink-950/70 py-2.5 pl-10 pr-4 text-sm text-mist-100 placeholder:text-mist-500 transition-colors duration-200 focus:border-volt-500/60 focus:outline-none"
+      />
+    </label>
+
+    <div role="group" aria-label="Filter by category" class="flex flex-wrap gap-2">
+      <button type="button" data-filter="all" aria-pressed="true" class="filter-chip">All</button>
+      {
+        CATEGORIES.map((category) => (
+          <button type="button" data-filter={category} aria-pressed="false" class="filter-chip">
+            {CATEGORY_META[category].label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <p data-count class="text-sm text-mist-500" aria-live="polite">{articles.length} articles</p>
+
+  <div data-grid class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    {
+      articles.map((article) => (
+        <div
+          data-item
+          data-category={article.data.category}
+          data-search={[article.data.title, article.data.description, ...article.data.tags].join(' ').toLowerCase()}
+          class="h-full"
+        >
+          <ArticleCard article={article} />
+        </div>
+      ))
+    }
+  </div>
+
+  <div data-empty hidden class="glass rounded-3xl p-10 text-center">
+    <p class="text-lg font-semibold text-white">No articles match that search.</p>
+    <p class="mt-2 text-sm text-mist-400">Try a different word, or choose another category.</p>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-explorer]');
+
+  if (root) {
+    const input = root.querySelector<HTMLInputElement>('[data-search]');
+    const chips = root.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const items = root.querySelectorAll<HTMLElement>('[data-item]');
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    let category = 'all';
+
+    const apply = () => {
+      const query = (input?.value ?? '').trim().toLowerCase();
+      let shown = 0;
+      items.forEach((item) => {
+        const matchesCategory = category === 'all' || item.dataset.category === category;
+        const matchesText = !query || (item.dataset.search ?? '').includes(query);
+        const visible = matchesCategory && matchesText;
+        item.hidden = !visible;
+        if (visible) shown += 1;
+      });
+      if (count) count.textContent = `${shown} of ${items.length} articles`;
+      if (empty) empty.hidden = shown > 0;
+    };
+
+    input?.addEventListener('input', apply);
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        category = chip.dataset.filter ?? 'all';
+        chips.forEach((other) => other.setAttribute('aria-pressed', String(other === chip)));
+        apply();
+      });
+    });
+  }
+</script>
