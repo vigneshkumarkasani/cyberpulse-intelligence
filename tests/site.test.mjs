@@ -38,10 +38,10 @@ test('no executable or stylesheet source requests Google Fonts or any other exte
   }
 });
 
-test('the four self-hosted WOFF2 font files exist, with the WOFF2 signature', () => {
+test('the two self-hosted WOFF2 font files exist, with the WOFF2 signature', () => {
   const dir = 'src/assets/fonts';
   const fonts = readdirSync(path.join(root, dir)).filter((f) => f.endsWith('.woff2'));
-  assert.equal(fonts.length, 4);
+  assert.equal(fonts.length, 2);
   for (const f of fonts) {
     const head = readFileSync(path.join(root, dir, f)).subarray(0, 4).toString('ascii');
     assert.equal(head, 'wOF2', `${f} must be a WOFF2 file`);
@@ -56,10 +56,10 @@ test('each self-hosted font has an OFL licence text alongside it', () => {
   }
 });
 
-test('global.css declares the four @font-face rules with font-display: swap', () => {
+test('global.css declares the two @font-face rules with font-display: swap', () => {
   const css = read('src/styles/global.css');
   const faces = css.match(/@font-face\s*\{[^}]*\}/g) ?? [];
-  assert.equal(faces.length, 4);
+  assert.equal(faces.length, 2);
   for (const face of faces) {
     assert.match(face, /font-display:\s*swap/);
     assert.match(face, /url\("\.\.\/assets\/fonts\/[^"]+\.woff2"\)/, 'relative path to a local font file');
