@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
-import DemoNotice from '../components/DemoNotice.astro';
 import { SITE } from '../consts';
 ---
 
@@ -32,9 +31,8 @@ import { SITE } from '../consts';
 
         <h2>Current state of the project</h2>
         <p>
-          This is the first production-quality version of the site. The articles currently in the repository are
-          <strong>sample content</strong> that demonstrates the structure, reading experience and metadata. They
-          are labelled as such on every page and are not research.
+          This is the first version of the site. It has no published articles yet, so there are no findings to cite.
+          Anything published later will be identified as research, with its sources.
         </p>
         <p>
           There is no automatic publishing, no live threat feed, no newsletter service and no analytics connected
@@ -50,7 +48,6 @@ import { SITE } from '../consts';
       </div>
 
       <aside class="space-y-6">
-        <DemoNotice />
         <div class="glass rounded-2xl p-6 text-sm leading-relaxed text-mist-300">
           <p class="font-semibold text-white">Stack</p>
           <p class="mt-2">Astro, TypeScript, Tailwind CSS and Markdown content collections, deployed to GitHub Pages with GitHub Actions.</p>

@@ -4,7 +4,6 @@ import FeaturedArticle from '../components/FeaturedArticle.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import CategoryNav from '../components/CategoryNav.astro';
 import StatsPanel from '../components/StatsPanel.astro';
-import NewsletterSignup from '../components/NewsletterSignup.astro';
 import DemoNotice from '../components/DemoNotice.astro';
 import NetworkField from '../components/NetworkField.astro';
 import IntelligencePanel from '../components/IntelligencePanel.astro';
@@ -96,7 +95,7 @@ const counts = countByCategory(articles);
         <a href={withBase('/research/')} class="text-sm font-medium text-volt-300 hover:text-white">View all research →</a>
       </div>
 
-      <DemoNotice class="mb-8" />
+      {articles.some((article) => article.data.demo) && <DemoNotice class="mb-8" />}
 
       {
         latest.length > 0 ? (
@@ -115,6 +114,5 @@ const counts = countByCategory(articles);
 
     <StatsPanel stats={stats} />
 
-    <NewsletterSignup />
   </div>
 </BaseLayout>

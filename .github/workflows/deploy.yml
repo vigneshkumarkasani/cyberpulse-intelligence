@@ -1,37 +1,44 @@
-# Builds the Astro site and deploys it to GitHub Pages.
+# Deploys the Astro site to GitHub Pages. Runs on a push to `main` only.
+#
+# This file never runs for a pull request: pull requests run .github/workflows/ci.yml, which has no
+# deployment permissions. Manual runs are not offered here. To publish again, re-run the last `main` run.
 #
 # One-time repository setting (required once):
 #   Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
 #
-# Runs on every push to `main` and can also be started by hand from the Actions tab.
+# Every third-party action is pinned to a full commit SHA, with its release tag in a comment.
 # No secrets or API keys are used by this workflow.
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 
-# Least privilege: read the repo, and write only to the Pages deployment.
+# Read the repository only. Each job requests more only where it needs it.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
-# Only one deployment at a time. Let an in-progress deploy finish.
+# Deployments share one group. A deployment that is running is never cancelled. A deployment that is
+# still waiting to start can be superseded by a newer push, so the newest commit on `main` is published.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-artifact:
+    # Builds the site and uploads it as a Pages artifact. Contents: read only.
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: npm
@@ -39,24 +46,43 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run tests before publishing
+        run: npm test
+
       - name: Type-check and build
         run: npm run build
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
       - name: Upload build artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: dist
 
-  deploy:
-    needs: build
+  configure:
+    # Checks that GitHub Pages is configured for this repository. The only job with pages: read.
+    # configure-pages never writes (enablement is off), and its outputs are not used.
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+
+  deploy:
+    # Publishes the artifact. Runs only after the build and the Pages check have both succeeded.
+    # The only job with pages: write and id-token: write.
+    needs: [build-artifact, configure]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

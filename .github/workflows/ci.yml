@@ -1,0 +1,52 @@
+# Validates every pull request to `main`, and every push to `main`: type check and build.
+# This workflow is validation only. It has no deployment permissions, no environment, and no step that
+# uploads or publishes anything.
+#
+# A pull request runs the copy of this file from its own merge commit. That is why this file must never
+# hold credentials: it has none. Deployment is in .github/workflows/deploy.yml, which runs on pushes to `main` only.
+#
+# No secrets or API keys are used by this workflow. Actions are pinned to full commit SHAs, with the release tag
+# in a comment. Dependabot (.github/dependabot.yml) proposes updates to the pins.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Read the repository only.
+permissions:
+  contents: read
+
+# A newer run for the same pull request (or the same branch) cancels the older one. Nothing here deploys.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests (workflow and JSON-LD regression tests)
+        run: npm test
+
+      - name: Type-check and build
+        run: npm run build

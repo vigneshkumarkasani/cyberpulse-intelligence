@@ -6,6 +6,7 @@ import RelatedArticles from '../components/RelatedArticles.astro';
 import { CATEGORY_META } from '../consts';
 import { formatDate, getReadingMinutes, type Article } from '../lib/articles';
 import { withBase } from '../lib/url';
+import { serializeJsonLd } from '../lib/jsonld.mjs';
 
 interface Props {
   article: Article;
@@ -44,7 +45,7 @@ const jsonLd = {
   modifiedTime={updated}
 >
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" set:html={serializeJsonLd(jsonLd)} />
   </Fragment>
 
   <div id="reading-progress" class="fixed inset-x-0 top-0 z-[60] h-0.5 origin-left scale-x-0 bg-linear-to-r from-volt-500 to-volt-300" aria-hidden="true"></div>
