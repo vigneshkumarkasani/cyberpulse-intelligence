@@ -1,6 +1,42 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------
+   Self-hosted fonts (see src/assets/fonts/README.md for sources and licences).
+   Weight ranges match each file's wght axis. font-display: swap shows fallback text while the file loads.
+   ------------------------------------------------------------------ */
+@font-face {
+  font-family: "Inter";
+  src: url("../assets/fonts/inter-latin-wght.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../assets/fonts/jetbrains-mono-latin-wght.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("../assets/fonts/source-serif-4-latin-wght-opsz.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("../assets/fonts/source-serif-4-italic-latin-opsz.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ------------------------------------------------------------------
    Theme tokens (Tailwind v4 reads these as utilities, e.g. bg-ink-950)
    ------------------------------------------------------------------ */
 @theme {

@@ -1,0 +1,15 @@
+# Proposes weekly updates to the commit-SHA pins of the GitHub Actions used by .github/workflows/*.yml,
+# and to the npm packages in package.json and package-lock.json (the website at the repository root).
+# Each update arrives as a pull request, so a changed pin or package is reviewed like any other change.
+# The Python engine is a separate repository and is not monitored here.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"

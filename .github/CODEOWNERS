@@ -1,0 +1,11 @@
+# Code owners: changes to GitHub Actions workflows and repository configuration need an approving review
+# from a code owner listed here, once "Require review from Code Owners" is enabled on the protected branch.
+#
+# GitHub does not count a pull request author's own approval. The owner below cannot approve a pull request
+# they wrote. A second, independent reviewer must be added to these rules (as a collaborator or a team) before
+# a change made by the owner can be merged under this rule.
+#
+# Format: <pattern> <owner> [<owner> ...]. The last matching pattern wins.
+
+/.github/ @vigneshkumarkasani
+/.github/workflows/ @vigneshkumarkasani

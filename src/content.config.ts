@@ -21,8 +21,7 @@ const articles = defineCollection({
           url: z.url().optional(),
           publisher: z.string().optional(),
         }),
-      )
-      .default([]),
+      ).min(1),
     featured: z.boolean().default(false),
     // Defaults to true so that any article is labelled as sample content
     // unless its author explicitly marks it as real research.

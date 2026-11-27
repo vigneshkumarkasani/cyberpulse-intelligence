@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { SITE } from '../consts';
+
+const issuesUrl = `${SITE.repository}/issues`;
+const githubPrivacyStatement = 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement';
+const githubCookies = 'https://docs.github.com/en/site-policy/privacy-policies/github-cookies';
+const githubPagesOverview = 'https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages';
+---
+
+<BaseLayout title="Privacy" description="What the CyberPulse Intelligence website collects, which services it contacts, and how to ask a question." path="/privacy/">
+  <PageHero
+    eyebrow="Privacy"
+    title="Privacy notice"
+    description="A plain description of what this website does with visitor requests, based on how the site is built."
+  />
+
+  <section class="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
+    <div class="prose-article max-w-[68ch]">
+      <p class="text-sm text-mist-500">Last reviewed: <time datetime="2026-11-27">27 November 2026</time>.</p>
+
+      <h2>What this site is</h2>
+      <p>
+        CyberPulse Intelligence is a static website. Its pages are generated in advance and served from GitHub Pages.
+        In the current code, the site has no user accounts, no login, no comments and no server of its own that
+        handles visitor data.
+      </p>
+
+      <h2>Information you give us</h2>
+      <p>
+        In the current code, the site asks visitors for nothing. It has no contact forms and no newsletter sign-up.
+        The site's research search, when available, runs in your browser only. Nothing you type on the site is sent to a server in the
+        current code.
+      </p>
+
+      <h2>Cookies and browser storage</h2>
+      <p>
+        In the current code, the site does not set cookies and does not write to browser local storage or session
+        storage.
+      </p>
+      <p>
+        GitHub's cookie information describes the cookies GitHub uses on its own websites. It does not say which
+        cookies, if any, are set on GitHub Pages sites. Read it on
+        <a href={githubCookies} rel="noopener" target="_blank">GitHub's cookies page</a>.
+      </p>
+
+      <h2>Analytics and tracking</h2>
+      <p>
+        In the current code, the site includes no analytics, advertising or tracking code, and it loads no
+        third-party scripts. The scripts that run in your browser are part of the site's own build.
+      </p>
+
+      <h2>Requests to other services</h2>
+      <p>
+        When you open a page, your browser requests it from GitHub Pages. GitHub's documentation for GitHub Pages says
+        that the visitor's IP address is logged and stored for security purposes, regardless of whether the visitor has
+        signed into GitHub. See
+        <a href={githubPagesOverview} rel="noopener" target="_blank">What is GitHub Pages</a>.
+      </p>
+      <p>
+        GitHub's general privacy statement describes automatic logging of website interactions, including the
+        referring site, date and time of visit, pages viewed and links clicked. This notice does not confirm how that
+        statement applies to GitHub Pages sites specifically. Read it on
+        <a href={githubPrivacyStatement} rel="noopener" target="_blank">GitHub's general privacy statement</a>.
+      </p>
+      <p>
+        The fonts used on the site are served from this site. The site does not contact Google Fonts or any other
+        font service.
+      </p>
+      <p>
+        Links to references and to the source repository open the other site in a new tab. Those sites have their
+        own privacy practices, which this notice does not cover.
+      </p>
+
+      <h2>Questions and corrections</h2>
+      <p>
+        Questions about this notice, and corrections to published research, are handled through the
+        <a href={issuesUrl} rel="noopener" target="_blank">issue tracker on GitHub</a>. No other contact address is
+        published for this site.
+      </p>
+      <p>
+        The issue tracker is hosted by GitHub and is public. Questions, comments and other information you submit there
+        may be visible to anyone. Items you post there are shown under your GitHub account name. Do not include
+        passwords, personal information, confidential information or security-sensitive details.
+      </p>
+
+      <h2>Changes to this notice</h2>
+      <p>
+        If the site's data collection or use changes, we will update this notice to reflect those changes.
+      </p>
+
+      <p class="text-sm text-mist-500">
+        This page describes how the site works. It is not legal advice, and it does not state a legal entity or a
+        legal basis for processing.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
