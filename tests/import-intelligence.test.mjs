@@ -246,11 +246,17 @@ test('applyPlan never overwrites a file that appears after planning', () => {
 
 // ------------------------------------------------------------ command line
 
+// A missing articles folder is an empty folder: git does not track empty directories, so a clean checkout may not have it.
+const listArticles = () => {
+  const dir = path.join(root, 'src/content/articles');
+  return existsSync(dir) ? readdirSync(dir).sort() : [];
+};
+
 test('the command line refuses a synthetic bundle, exits 1, and changes no article', () => {
   const { base } = dirs();
   const bundlePath = path.join(base, 'bundle.json');
   writeFileSync(bundlePath, JSON.stringify(makeBundle()));
-  const before = readdirSync(path.join(root, 'src/content/articles')).sort();
+  const before = listArticles();
   let status = 0;
   try {
     execFileSync(process.execPath, [path.join(root, 'scripts/import-intelligence.mjs'), bundlePath], { stdio: 'pipe' });
@@ -258,7 +264,7 @@ test('the command line refuses a synthetic bundle, exits 1, and changes no artic
     status = err.status;
   }
   assert.equal(status, 1);
-  assert.deepEqual(readdirSync(path.join(root, 'src/content/articles')).sort(), before);
+  assert.deepEqual(listArticles(), before);
 });
 
 // ------------------------------------------------------------ verification labels
