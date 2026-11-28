@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vigneshkumarkasani.github.io/cyberpulse-intelligence/schemas/intelligence-export-v1.schema.json",
+  "title": "CyberPulse intelligence export v1",
+  "description": "A bundle of APPROVED editorial revisions exported from the CyberPulse Engine for human-reviewed import into the website. Canonical copy: cyberpulse-engine/schemas. The website keeps an identical copy and its importer enforces the same rules.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "engine_commit", "synthetic", "articles"],
+  "properties": {
+    "schema_version": { "const": "intelligence-export/v1" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "engine_commit": { "type": "string", "minLength": 1 },
+    "synthetic": { "const": false, "description": "Production bundles are never synthetic. Test fixtures set this to true and are refused by the importer." },
+    "skipped": { "type": "array", "items": { "type": "object" }, "description": "Informational. Articles the exporter declined, with reasons." },
+    "articles": { "type": "array", "items": { "$ref": "#/$defs/article" } }
+  },
+  "$defs": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "https_url": { "type": "string", "pattern": "^https://" },
+    "article": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "article_key", "engine_article_id", "revision", "approved_at", "approved_by", "state", "title", "slug",
+        "description", "category", "date", "updated", "last_verified", "confidence", "verification_status", "demo",
+        "tags", "cve_ids", "references", "claims", "associations", "body_markdown", "content_sha256", "synthetic",
+        "export_status"
+      ],
+      "properties": {
+        "article_key": { "type": "string", "pattern": "^[a-z_]+:[A-Za-z0-9._-]+$", "description": "Stable, unique key, e.g. cve_investigation:CVE-2026-48027." },
+        "engine_article_id": { "type": "integer", "minimum": 1 },
+        "revision": { "type": "integer", "minimum": 1 },
+        "update_of_revision": { "type": "integer", "minimum": 1, "description": "Present only when export_status is update_proposal." },
+        "export_status": { "enum": ["new", "update_proposal"] },
+        "approved_at": { "type": "string" },
+        "approved_by": { "type": "string", "minLength": 1 },
+        "state": { "const": "APPROVED" },
+        "title": { "type": "string", "minLength": 1 },
+        "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "description": { "type": "string", "minLength": 40, "maxLength": 220 },
+        "category": { "enum": ["research", "cve", "malware", "threat-actors", "exploits"] },
+        "date": { "$ref": "#/$defs/date" },
+        "updated": { "$ref": "#/$defs/date" },
+        "last_verified": { "$ref": "#/$defs/date", "description": "Newest retrieval date among the cited evidence." },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "verification_status": { "enum": ["confirmed", "unverified"], "description": "confirmed only when every cited claim is CONFIRMED." },
+        "demo": { "const": false },
+        "tags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "cve_ids": { "type": "array", "items": { "type": "string", "pattern": "^CVE-\\d{4}-\\d{4,}$" } },
+        "references": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "url", "publisher", "evidence_id", "authority"],
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "url": { "$ref": "#/$defs/https_url" },
+              "publisher": { "type": "string", "minLength": 1 },
+              "evidence_id": { "type": "string", "minLength": 1 },
+              "authority": { "enum": ["primary", "secondary", "unknown"] }
+            }
+          }
+        },
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "text", "classification", "investigation", "evidence_ids"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "text": { "type": "string", "minLength": 1 },
+              "classification": { "enum": ["CONFIRMED", "ASSESSED", "UNVERIFIED", "DISPUTED", "UNKNOWN"] },
+              "investigation": { "type": "string" },
+              "evidence_ids": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "associations": {
+          "type": "array",
+          "description": "Malware or threat-actor links. Each needs direct evidence and a CONFIRMED or ASSESSED claim. Never inferred.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "statement", "claim_id", "classification", "evidence_ids"],
+            "properties": {
+              "type": { "enum": ["malware", "threat_actor"] },
+              "statement": { "type": "string", "minLength": 1 },
+              "claim_id": { "type": "string", "minLength": 1 },
+              "classification": { "enum": ["CONFIRMED", "ASSESSED"] },
+              "evidence_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+            }
+          }
+        },
+        "body_markdown": { "type": "string", "minLength": 1 },
+        "content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "SHA-256 of body_markdown (UTF-8)." },
+        "synthetic": { "const": false }
+      }
+    }
+  }
+}

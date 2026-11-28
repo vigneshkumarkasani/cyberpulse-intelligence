@@ -1,0 +1,43 @@
+---
+// Shows how strongly an article's cited claims are supported. The label is the weakest claim's
+// classification: an article is CONFIRMED only when every claim is CONFIRMED. Text is always shown,
+// so the meaning never depends on colour alone.
+interface Props {
+  label?: 'CONFIRMED' | 'ASSESSED' | 'UNVERIFIED';
+  confidence?: 'high' | 'medium' | 'low';
+  class?: string;
+}
+
+const { label, confidence, class: className } = Astro.props;
+
+const copy = {
+  CONFIRMED: 'Every cited claim is supported by reliable primary evidence.',
+  ASSESSED: 'At least one cited claim is an assessment that needs interpretation.',
+  UNVERIFIED: 'At least one cited claim is not verified. Do not treat this article as confirmed.',
+} as const;
+
+const tone = {
+  CONFIRMED: 'border-volt-400/50 text-volt-300',
+  ASSESSED: 'border-white/20 text-mist-100',
+  UNVERIFIED: 'border-amber-400/60 text-amber-300',
+} as const;
+---
+
+<aside
+  class:list={['rounded-lg border bg-white/[0.03] px-4 py-3 text-sm text-mist-300', className]}
+  aria-label="Verification status"
+>
+  {
+    label ? (
+      <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span class={`rounded border px-2 py-0.5 font-mono text-xs font-semibold tracking-wide ${tone[label]}`}>
+          {label}
+        </span>
+        <span>{copy[label]}</span>
+        {confidence && <span class="text-mist-400">Confidence: {confidence}</span>}
+      </p>
+    ) : (
+      <p>Verification is not recorded for this article.</p>
+    )
+  }
+</aside>

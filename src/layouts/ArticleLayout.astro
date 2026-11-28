@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import DemoNotice from '../components/DemoNotice.astro';
+import VerificationLabel from '../components/VerificationLabel.astro';
 import ReferenceList from '../components/ReferenceList.astro';
 import RelatedArticles from '../components/RelatedArticles.astro';
 import { CATEGORY_META } from '../consts';
@@ -75,6 +76,12 @@ const jsonLd = {
             </ul>
           </div>
         </header>
+
+        <VerificationLabel
+          class="mt-8"
+          label={article.data.verification_label}
+          confidence={article.data.confidence}
+        />
 
         {demo && <DemoNotice class="mt-8" />}
 

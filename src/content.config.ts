@@ -26,6 +26,17 @@ const articles = defineCollection({
     // Defaults to true so that any article is labelled as sample content
     // unless its author explicitly marks it as real research.
     demo: z.boolean().default(true),
+    // Optional metadata written by scripts/import-intelligence.mjs from an engine export.
+    // Hand-written articles do not need these fields.
+    article_key: z.string().optional(),
+    revision: z.number().int().positive().optional(),
+    content_sha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+    cve_ids: z.array(z.string().regex(/^CVE-\d{4}-\d{4,}$/)).optional(),
+    last_verified: z.coerce.date().optional(),
+    confidence: z.enum(['high', 'medium', 'low']).optional(),
+    verification_status: z.enum(['confirmed', 'unverified']).optional(),
+    // The weakest cited claim: CONFIRMED only when every claim is CONFIRMED. Shown on the article page.
+    verification_label: z.enum(['CONFIRMED', 'ASSESSED', 'UNVERIFIED']).optional(),
   }),
 });
 
