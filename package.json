@@ -14,7 +14,7 @@
     "build:fast": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "node --test tests/workflows.test.mjs tests/jsonld.test.mjs tests/site.test.mjs",
+    "test": "node --test tests/workflows.test.mjs tests/jsonld.test.mjs tests/site.test.mjs tests/import-intelligence.test.mjs",
     "astro": "astro"
   },
   "dependencies": {
